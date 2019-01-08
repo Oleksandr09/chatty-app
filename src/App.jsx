@@ -1,10 +1,17 @@
 import React, {Component} from 'react';
+import NavBar from './NavBar.jsx'
+import ChatBar from './ChatBar.jsx';
+import MessageList from './MessageList.jsx';
 
 class App extends Component {
   render() {
     return (
-      <h1>Hello React :)</h1>
-    );
+      <div>
+        <NavBar />
+        <MessageList />
+        <ChatBar />
+      </div>
+    )
   }
 }
 export default App;
