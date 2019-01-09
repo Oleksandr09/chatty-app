@@ -3,60 +3,37 @@ import ChatBar from './ChatBar.jsx';
 import MessageList from './MessageList.jsx';
 
 
-
 class App extends Component {
   constructor(props){
     super(props);
-
+   
     this.state = {
-        idCounter: 3,
-        currentUser: {name: "Bob"},
-        messages: [
-          {
-            type: "incomingMessage",
-            content: "I'd love to download a fried egg, but I'm afraid encryption would scramble it",
-            username: "Anonymous2",
-            id: 1
-          },
-          {
-            type: "incomingMessage",
-            content: "This isn't funny. You're not funny",
-            username: "nomnom",
-            id: 2
-          }
-        ]
+        currentUser: {name: ""},
+        messages: []
     }
-
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.clearInput = this.clearInput.bind(this);
+    this._updateName = this._updateName.bind(this);
+    this.createMessage = this.createMessage.bind(this);
   }
 
-  handleSubmit(event) {
-    if (event.keyCode == 13) {
-      event.preventDefault();
-      this.createMessage(event.target);
-    } else {
-      console.log("Nope");
-    }
-  }
+  componentDidMount() {
+    this.socket = new WebSocket('ws://localhost:3001');
 
-  createMessage(str) {
-    const id = this.state.idCounter + 1;
-    const content = str.value;
-    const username = this.state.currentUser.name;
-    const newMessage = {
-      id: id,
-      content: content,
-      username: username
-    }
-    const messages = this.state.messages.concat(newMessage);
-    this.setState({messages: messages, idCounter: id})
-  }
+    this.socket.onopen = () => {
+      console.log('Connected to WebSocket');
+    };
 
-  clearInput(event) {
-      if(event.keyCode == 13) {
-        event.target.value = "";
-      }
+    this.socket.onmessage = payload => {
+      console.log('Got message from server');
+      const json = JSON.parse(payload.data)
+
+      this.setState({
+        messages: [...this.state.messages, json]
+      });
+    };
+
+    this.socket.onclose = () => {
+      console.log('Disconnected from the WebSocket');
+    };
   }
 
   render() {
@@ -66,9 +43,32 @@ class App extends Component {
         <a className="navbar-brand" href="/">Chatty</a>
       </nav>
       <MessageList messages={this.state.messages} />
-      <ChatBar currentUser={this.state.currentUser} handleSubmit={this.handleSubmit} clearInput={this.clearInput} />
+      <ChatBar currentUser={this.state.currentUser.name} createMessage={this.createMessage}  _updateName={this._updateName} />
       </div>
     )
+  }
+
+  createMessage(str) {
+    
+    const content = str;
+    const username = this.state.currentUser.name;
+    const newMessage = {
+      content: content,
+      username: username
+    }
+    console.log(this.state.currentUser.name);
+    this.socket.send(JSON.stringify(newMessage));
+
+
+    // const messages = this.state.messages.concat(newMessage);
+
+    // this.setState({messages: messages, idCounter: id})
+    
+  }
+
+  _updateName(name) {
+    this.setState({ currentUser: { name: name} })
+  
   }
 }
 export default App;

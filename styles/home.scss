@@ -1,13 +1,13 @@
 body {
   background: white;
-  color: black;
+  color: #202124;
   font-family: 'Open Sans', sans-serif;
-  font-size: 14px;
+  font-size: 18px;
   margin: 70px 0;
 }
 
 .navbar {
-  background: tomato;
+  background: #202124;
   border-bottom: 1px solid black;
   height: 60px;
   left: 0;
@@ -15,9 +15,10 @@ body {
   position: fixed;
   right: 0;
   top: 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,.5);
 
   .navbar-brand {
-    color: inherit;
+    color: white;
     display: block;
     float: left;
     font-weight: 700;
@@ -26,11 +27,17 @@ body {
     line-height: 60px;
     padding: 0 10px;
     text-decoration: none;
+    box-sizing: border-box;
+
+    &:hover{
+      border-bottom: 3px solid white;
+
+    }
   }
 }
 
 .chatbar {
-  background: tomato;
+  background: #202124;
   border-top: 1px solid black;
   bottom: 0;
   display: flex;
@@ -66,15 +73,19 @@ body {
       overflow: hidden;
       margin: 5px;
       padding: 0 10px;
+      
     }
 
     .message-content {
       flex: 8;
+      
     }
 
     .message-username {
       flex: 2;
       font-weight: 700;
+
+
     }
 }
 
