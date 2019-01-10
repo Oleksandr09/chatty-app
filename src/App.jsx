@@ -10,6 +10,7 @@ class App extends Component {
     this.state = {
         currentUser: {name: ""},
         messages: [],
+        numbers: 0
     }
     this._updateName = this._updateName.bind(this);
     this.createMessage = this.createMessage.bind(this);
@@ -21,14 +22,28 @@ class App extends Component {
 
     this.socket.onopen = () => {
       console.log('Connected to WebSocket');
+      
+      
     };
 
     this.socket.onmessage = payload => {
       console.log('Got message from server');
       const json = JSON.parse(payload.data);
+
+      switch (json.type) {
+        case 'incoming-message':
+        case 'incoming-notification':   
           this.setState({
             messages: [...this.state.messages, json]
           });
+          break;
+        case 'active-users':
+          this.setState({ numbers: json.userCount});
+          console.log(this.state.numbers);
+          break;
+       default:
+      }
+          
     };
 
     this.socket.onclose = () => {
@@ -41,6 +56,7 @@ class App extends Component {
       <div>
       <nav className="navbar">
         <a className="navbar-brand" href="/">Chatty</a>
+        <span className="users">{this.state.numbers} users active</span>
       </nav>
       <MessageList messages={this.state.messages} systemMessages={this.state.notifications} />
       <ChatBar currentUser={this.state.currentUser.name} createMessage={this.createMessage}  _updateName={this._updateName} _sendNotification={this._sendNotification} />

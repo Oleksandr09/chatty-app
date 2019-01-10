@@ -15,7 +15,14 @@ const server = http.createServer(app);
 const wss = new SocketServer({ server });
 
 
+
 const messageDB = [];
+
+
+const activeUsers = {
+    userCount: null,
+    type: "active-users"
+}
 
 wss.broadcastJSON = obj => wss.broadcast(JSON.stringify(obj));
 
@@ -28,8 +35,12 @@ wss.broadcast = data => {
     });
 };
 
+
 wss.on('connection', (ws) => {
     console.log('Client connected');
+    activeUsers.userCount = wss.clients.size;
+    wss.broadcastJSON(activeUsers);
+
 
     ws.on('message', data => {
         const objData = JSON.parse(data);

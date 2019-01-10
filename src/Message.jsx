@@ -12,7 +12,7 @@ class Message extends Component {
         } else if (this.props.type === "incoming-notification") {
             return (
                 <div className="message system">
-                    <span className="message-content">{this.props.content}</span>
+                    <span className="message-content" key={this.props.key}>{this.props.content}</span>
                 </div>
             )
         }
