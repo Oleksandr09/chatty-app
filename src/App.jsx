@@ -9,10 +9,11 @@ class App extends Component {
    
     this.state = {
         currentUser: {name: ""},
-        messages: []
+        messages: [],
     }
     this._updateName = this._updateName.bind(this);
     this.createMessage = this.createMessage.bind(this);
+    this._sendNotification = this._sendNotification.bind(this);
   }
 
   componentDidMount() {
@@ -24,11 +25,10 @@ class App extends Component {
 
     this.socket.onmessage = payload => {
       console.log('Got message from server');
-      const json = JSON.parse(payload.data)
-
-      this.setState({
-        messages: [...this.state.messages, json]
-      });
+      const json = JSON.parse(payload.data);
+          this.setState({
+            messages: [...this.state.messages, json]
+          });
     };
 
     this.socket.onclose = () => {
@@ -42,8 +42,8 @@ class App extends Component {
       <nav className="navbar">
         <a className="navbar-brand" href="/">Chatty</a>
       </nav>
-      <MessageList messages={this.state.messages} />
-      <ChatBar currentUser={this.state.currentUser.name} createMessage={this.createMessage}  _updateName={this._updateName} />
+      <MessageList messages={this.state.messages} systemMessages={this.state.notifications} />
+      <ChatBar currentUser={this.state.currentUser.name} createMessage={this.createMessage}  _updateName={this._updateName} _sendNotification={this._sendNotification} />
       </div>
     )
   }
@@ -54,21 +54,28 @@ class App extends Component {
     const username = this.state.currentUser.name;
     const newMessage = {
       content: content,
-      username: username
+      username: username,
+      type: "post-message"
     }
-    console.log(this.state.currentUser.name);
     this.socket.send(JSON.stringify(newMessage));
-
-
-    // const messages = this.state.messages.concat(newMessage);
-
-    // this.setState({messages: messages, idCounter: id})
     
   }
 
   _updateName(name) {
     this.setState({ currentUser: { name: name} })
   
+  }
+  _sendNotification(name) {
+    console.log("Hello", name);
+    const username = this.state.currentUser.name;
+    const notification = {
+      previousUsername: username,
+      newUsername: name,
+      type: "post-notification"
+    }
+    this.socket.send(JSON.stringify(notification));
+
+    this.setState({ currentUser: { name: name} })
   }
 }
 export default App;

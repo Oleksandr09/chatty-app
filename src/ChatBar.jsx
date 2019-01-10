@@ -34,11 +34,14 @@ class ChatBar extends Component {
     _handleName(event) {
         if (event.keyCode == 13) {
             event.preventDefault();
-            if (event.target.value.length === 0) {
+            if (event.target.value === "") {
                 this.props._updateName("Anonymous");
-            } else if (event.target.value.length !== 0){
+            } else if (event.target.value !== "" && this.props.currentUser === "") {
                 this.props._updateName(event.target.value);
+            } else if (event.target.value !== "" && this.props.currentUser !== "") {
+                this.props._sendNotification(event.target.value);
             }
+            
             this.refs["msg"].focus();
         }
     }

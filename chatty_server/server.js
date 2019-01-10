@@ -23,7 +23,7 @@ wss.broadcast = data => {
     wss.clients.forEach(ws => {
         if (ws.readyState === WebSocket.OPEN){
             ws.send(data);
-            console.log("Data is sent");
+            console.log("Data is sent", data);
         }
     });
 };
@@ -35,14 +35,34 @@ wss.on('connection', (ws) => {
         const objData = JSON.parse(data);
         console.log('Got the message from the client', objData.content);
 
-        const objToBroadcast = {
-            id: uuid(),
-            content: objData.content,
-            username: objData.username
-        };
+        switch (objData.type) {
+            case 'post-message' :
+                const objToBroadcast = {
+                    id: uuid(),
+                    content: objData.content,
+                    username: objData.username,
+                    type: "incoming-message"
+                };
+                messageDB.push(objToBroadcast);
+                wss.broadcastJSON(objToBroadcast);
+                break;
         
-        messageDB.push(objToBroadcast);
-        wss.broadcastJSON(objToBroadcast);
+        
+            case 'post-notification' :
+                const notificationMessage = {
+                    id: uuid(),
+                    content: `User *${objData.previousUsername}* changed their name to *${objData.newUsername}*`,
+                    type: "incoming-notification"
+                };
+                messageDB.push(notificationMessage);
+                wss.broadcastJSON(notificationMessage);
+                break;
+            default:
+            }
+
+        
+        
+       
     });
 
     ws.on('close', () => console.log('Client disconnected'));

@@ -68,6 +68,12 @@ body {
   display: flex;
   padding: 5px;
 
+  .message.system {
+    font-style: italic;
+    padding: 5px 20px;
+  }
+
+
   .message-content,
     .message-username {
       overflow: hidden;

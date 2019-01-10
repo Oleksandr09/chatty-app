@@ -5,15 +5,14 @@ class MessageList extends Component {
     render() {
         const messageArr = this.props.messages;
         const messageItem = messageArr.map((message) => 
-            <Message username={message.username} content={message.content} key={message.id} />
+            <Message username={message.username} content={message.content} key={message.id} type={message.type} />
         );
+        const systemMessages = this.props.systemMessages;
+
         return(
             <main className="messages">
                 {messageItem}
-            <div className="message system">
                 
-            </div>
-
             </main>
         )
     }
