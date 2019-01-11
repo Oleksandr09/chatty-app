@@ -10,7 +10,9 @@ class App extends Component {
     this.state = {
         currentUser: {name: ""},
         messages: [],
-        numbers: 0
+        numbers: 0,
+        color: ""
+        
     }
     this._updateName = this._updateName.bind(this);
     this.createMessage = this.createMessage.bind(this);
@@ -23,9 +25,6 @@ class App extends Component {
     this.socket.onopen = () => {
       console.log('Connected to WebSocket');
       
-      
-    };
-
     this.socket.onmessage = payload => {
       console.log('Got message from server');
       const json = JSON.parse(payload.data);
@@ -36,6 +35,10 @@ class App extends Component {
           this.setState({
             messages: [...this.state.messages, json]
           });
+          console.log(this.state.messages);
+          break;
+        case 'initial-messages':
+          this.setState({messages: json.messages, color: json.color });
           break;
         case 'active-users':
           this.setState({ numbers: json.userCount});
@@ -50,7 +53,7 @@ class App extends Component {
       console.log('Disconnected from the WebSocket');
     };
   }
-
+  }
   render() {
     return (
       <div>
@@ -68,10 +71,12 @@ class App extends Component {
     
     const content = str;
     const username = this.state.currentUser.name;
+    const color = this.state.color;
     const newMessage = {
       content: content,
       username: username,
-      type: "post-message"
+      type: "post-message",
+      color: color
     }
     this.socket.send(JSON.stringify(newMessage));
     
@@ -89,6 +94,7 @@ class App extends Component {
       newUsername: name,
       type: "post-notification"
     }
+
     this.socket.send(JSON.stringify(notification));
 
     this.setState({ currentUser: { name: name} })

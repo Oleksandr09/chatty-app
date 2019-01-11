@@ -14,15 +14,9 @@ const server = http.createServer(app);
 
 const wss = new SocketServer({ server });
 
-
-
 const messageDB = [];
 
 
-const activeUsers = {
-    userCount: null,
-    type: "active-users"
-}
 
 wss.broadcastJSON = obj => wss.broadcast(JSON.stringify(obj));
 
@@ -34,13 +28,17 @@ wss.broadcast = data => {
         }
     });
 };
+const colors = ['#4286f4','#003407','#a51a4d','#c7f4da'];
 
+const activeUsers = {
+    userCount: null,
+    type: "active-users" 
+}
 
 wss.on('connection', (ws) => {
     console.log('Client connected');
     activeUsers.userCount = wss.clients.size;
     wss.broadcastJSON(activeUsers);
-
 
     ws.on('message', data => {
         const objData = JSON.parse(data);
@@ -52,11 +50,13 @@ wss.on('connection', (ws) => {
                     id: uuid(),
                     content: objData.content,
                     username: objData.username,
-                    type: "incoming-message"
+                    type: "incoming-message",
+                    color: objData.color
                 };
                 messageDB.push(objToBroadcast);
                 wss.broadcastJSON(objToBroadcast);
                 break;
+            
         
         
             case 'post-notification' :
@@ -75,6 +75,16 @@ wss.on('connection', (ws) => {
         
        
     });
+
+    const initialMessage = {
+        type: 'initial-messages',
+        messages: messageDB,
+        color: colors[Math.floor(colors.length * Math.random())]
+
+      };
+
+      ws.send(JSON.stringify(initialMessage));
+      
 
     ws.on('close', () => console.log('Client disconnected'));
 });

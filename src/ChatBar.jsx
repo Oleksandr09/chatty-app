@@ -48,6 +48,7 @@ class ChatBar extends Component {
 
     _updateTerm(event) {
         this.setState({ term: event.target.value})
+    
     }
 
     _handleSubmit(event) {
@@ -62,3 +63,4 @@ class ChatBar extends Component {
 
 
 export default ChatBar;
+
