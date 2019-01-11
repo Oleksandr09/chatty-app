@@ -15,7 +15,7 @@ class App extends Component {
         
     }
     this._updateName = this._updateName.bind(this);
-    this.createMessage = this.createMessage.bind(this);
+    this._createMessage = this._createMessage.bind(this);
     this._sendNotification = this._sendNotification.bind(this);
   }
 
@@ -25,34 +25,34 @@ class App extends Component {
     this.socket.onopen = () => {
       console.log('Connected to WebSocket');
       
-    this.socket.onmessage = payload => {
-      console.log('Got message from server');
-      const json = JSON.parse(payload.data);
+      this.socket.onmessage = payload => {
+        console.log('Got message from server');
+        const json = JSON.parse(payload.data);
 
-      switch (json.type) {
-        case 'incoming-message':
-        case 'incoming-notification':   
-          this.setState({
-            messages: [...this.state.messages, json]
-          });
-          console.log(this.state.messages);
-          break;
-        case 'initial-messages':
-          this.setState({messages: json.messages, color: json.color });
-          break;
-        case 'active-users':
-          this.setState({ numbers: json.userCount});
-          console.log(this.state.numbers);
-          break;
-       default:
-      }
-          
-    };
+        switch (json.type) {
+          case 'incoming-message':
+          case 'incoming-notification':   
+            this.setState({
+              messages: [...this.state.messages, json]
+            });
+            console.log(this.state.messages);
+            break;
+          case 'initial-messages':
+            this.setState({messages: json.messages, color: json.color });
+            break;
+          case 'active-users':
+            this.setState({ numbers: json.userCount});
+            console.log(this.state.numbers);
+            break;
+        default:
+        }
+            
+      };
 
-    this.socket.onclose = () => {
-      console.log('Disconnected from the WebSocket');
-    };
-  }
+      this.socket.onclose = () => {
+        console.log('Disconnected from the WebSocket');
+      };
+    }
   }
   render() {
     return (
@@ -62,13 +62,13 @@ class App extends Component {
         <span className="users">{this.state.numbers} users active</span>
       </nav>
       <MessageList messages={this.state.messages} systemMessages={this.state.notifications} />
-      <ChatBar currentUser={this.state.currentUser.name} createMessage={this.createMessage}  _updateName={this._updateName} _sendNotification={this._sendNotification} />
+      <ChatBar currentUser={this.state.currentUser.name} createMessage={this._createMessage}  _updateName={this._updateName} _sendNotification={this._sendNotification} />
       </div>
     )
   }
 
-  createMessage(str) {
-    
+  _createMessage(str) {
+
     const content = str;
     const username = this.state.currentUser.name;
     const color = this.state.color;
@@ -79,12 +79,10 @@ class App extends Component {
       color: color
     }
     this.socket.send(JSON.stringify(newMessage));
-    
   }
 
   _updateName(name) {
-    this.setState({ currentUser: { name: name} })
-  
+    this.setState({ currentUser: { name: name} });
   }
   _sendNotification(name) {
     console.log("Hello", name);
@@ -96,8 +94,7 @@ class App extends Component {
     }
 
     this.socket.send(JSON.stringify(notification));
-
-    this.setState({ currentUser: { name: name} })
+    this.setState({ currentUser: { name: name} });
   }
 }
 export default App;

@@ -8,15 +8,17 @@ const PORT = 3001;
 const app = express();
 const server = http.createServer(app);
 
-    app.use(express.static('public'));
-    server.listen(PORT, '0.0.0.0', 'localhost', () => console.log(`Listen on ${ PORT }`));
-
+app.use(express.static('public'));
+server.listen(PORT, '0.0.0.0', 'localhost', () => console.log(`Listen on ${ PORT }`));
 
 const wss = new SocketServer({ server });
 
 const messageDB = [];
-
-
+const colors = ['#4286f4','#003407','#a51a4d','#c7f4da'];
+const activeUsers = {
+    userCount: null,
+    type: "active-users" 
+}
 
 wss.broadcastJSON = obj => wss.broadcast(JSON.stringify(obj));
 
@@ -24,16 +26,9 @@ wss.broadcast = data => {
     wss.clients.forEach(ws => {
         if (ws.readyState === WebSocket.OPEN){
             ws.send(data);
-            console.log("Data is sent", data);
         }
     });
 };
-const colors = ['#4286f4','#003407','#a51a4d','#c7f4da'];
-
-const activeUsers = {
-    userCount: null,
-    type: "active-users" 
-}
 
 wss.on('connection', (ws) => {
     console.log('Client connected');
@@ -42,9 +37,9 @@ wss.on('connection', (ws) => {
 
     ws.on('message', data => {
         const objData = JSON.parse(data);
-        console.log('Got the message from the client', objData.content);
-
+    
         switch (objData.type) {
+
             case 'post-message' :
                 const objToBroadcast = {
                     id: uuid(),
@@ -56,8 +51,6 @@ wss.on('connection', (ws) => {
                 messageDB.push(objToBroadcast);
                 wss.broadcastJSON(objToBroadcast);
                 break;
-            
-        
         
             case 'post-notification' :
                 const notificationMessage = {
@@ -70,17 +63,12 @@ wss.on('connection', (ws) => {
                 break;
             default:
             }
-
-        
-        
-       
     });
 
     const initialMessage = {
         type: 'initial-messages',
         messages: messageDB,
         color: colors[Math.floor(colors.length * Math.random())]
-
       };
 
       ws.send(JSON.stringify(initialMessage));

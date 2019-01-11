@@ -12,6 +12,7 @@ class ChatBar extends Component {
         this._updateTerm = this._updateTerm.bind(this);
         this._handleSubmit = this._handleSubmit.bind(this);
     }
+
     render() {
         return(
             <footer className="chatbar">
@@ -40,15 +41,13 @@ class ChatBar extends Component {
                 this.props._updateName(event.target.value);
             } else if (event.target.value !== "" && this.props.currentUser !== "") {
                 this.props._sendNotification(event.target.value);
-            }
-            
+            }   
             this.refs["msg"].focus();
         }
     }
 
     _updateTerm(event) {
-        this.setState({ term: event.target.value})
-    
+        this.setState({ term: event.target.value});
     }
 
     _handleSubmit(event) {
@@ -59,8 +58,6 @@ class ChatBar extends Component {
         } 
     }
 }
-
-
 
 export default ChatBar;
 

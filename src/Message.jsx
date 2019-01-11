@@ -2,8 +2,8 @@ import React, {Component} from 'react';
 
 class Message extends Component {
     render() {
-        let currentString = this.props.content;
-        let match = currentString.match('^https?:\/\/.*\.(?:png|jpg|gif)$');
+        let contentValue = this.props.content;
+        let match = contentValue.match('^https?:\/\/.*\.(?:png|jpg|gif)$');
         let currentColor = this.props.color;
         if (this.props.type === "incoming-message" && !match) {
             return(
@@ -30,6 +30,5 @@ class Message extends Component {
         }
     }
 }
-
 
 export default Message;
